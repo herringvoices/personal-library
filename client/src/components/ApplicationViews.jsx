@@ -4,6 +4,8 @@ import Login from "./auth/Login";
 import Register from "./auth/Register";
 import NavBar from "./NavBar";
 import CatalogueView from "./books/CatalogueView";
+import BookshelvesView from "./bookshelves/BookshelvesView";
+import BookshelfView from "./bookshelves/BookshelfView";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -26,7 +28,10 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           index
           element={
             <AuthorizedRoute loggedInUser={loggedInUser}>
-              <h1 className="text-center">Welcome</h1>
+              <h1 className="text-center">Welcome to Your Personal Library</h1>
+              <div className="text-center mt-4">
+                <p>What would you like to do today?</p>
+              </div>
             </AuthorizedRoute>
           }
         />
@@ -36,6 +41,24 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           element={
             <AuthorizedRoute loggedInUser={loggedInUser}>
               <CatalogueView />
+            </AuthorizedRoute>
+          }
+        />
+
+        <Route
+          path="bookshelves"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser}>
+              <BookshelvesView />
+            </AuthorizedRoute>
+          }
+        />
+
+        <Route
+          path="bookshelves/:id"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser}>
+              <BookshelfView />
             </AuthorizedRoute>
           }
         />

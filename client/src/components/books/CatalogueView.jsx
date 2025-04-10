@@ -9,6 +9,8 @@ import BookSearchForm from "./BookSearchForm";
 import BookFormOffcanvas from "./BookFormOffcanvas";
 import CreateEntityModal from "../common/CreateEntityModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import BookDetailsModal from "./BookDetailsModal";
+import EditBookModal from "./EditBookModal";
 
 export default function CatalogueView() {
   const [books, setBooks] = useState([]);
@@ -18,6 +20,9 @@ export default function CatalogueView() {
   const [categories, setCategories] = useState([]);
   const [series, setSeries] = useState([]);
   const [showAddBook, setShowAddBook] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [showBookDetails, setShowBookDetails] = useState(false);
+  const [editingBook, setEditingBook] = useState(null);
 
   // Add state for modals
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -136,6 +141,12 @@ export default function CatalogueView() {
     }
   };
 
+  // Handle book click to show details
+  const handleBookClick = (book) => {
+    setSelectedBook(book);
+    setShowBookDetails(true);
+  };
+
   return (
     <Container>
       <div className="d-flex justify-content-between align-items-center my-4">
@@ -171,7 +182,11 @@ export default function CatalogueView() {
         onSearch={handleSearch}
       />
 
-      {loading ? <p>Loading books...</p> : <BookList books={filteredBooks} />}
+      {loading ? (
+        <p>Loading books...</p>
+      ) : (
+        <BookList books={filteredBooks} onBookClick={handleBookClick} />
+      )}
 
       <BookFormOffcanvas
         show={showAddBook}
@@ -198,6 +213,27 @@ export default function CatalogueView() {
         title="Add New Bookshelf"
         entityName="Bookshelf"
         onCreate={handleCreateBookcase}
+      />
+
+      {/* Book Details Modal */}
+      <BookDetailsModal
+        book={selectedBook}
+        show={showBookDetails}
+        onHide={() => setShowBookDetails(false)}
+        onEdit={(book) => {
+          setEditingBook(book);
+          setShowBookDetails(false);
+        }}
+      />
+
+      {/* Edit Book Modal */}
+      <EditBookModal
+        book={editingBook}
+        onHide={() => setEditingBook(null)}
+        bookcases={bookcases}
+        categories={categories}
+        seriesList={series}
+        onSave={handleBookSaved}
       />
     </Container>
   );

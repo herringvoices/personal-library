@@ -17,9 +17,13 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
             {loggedInUser && (
               <>
                 <Nav.Link as={NavLink} to="/catalogue">
+                  <FontAwesomeIcon icon="search" className="me-1" />
                   Catalogue
                 </Nav.Link>
-                {/* More nav links will go here for other views */}
+                <Nav.Link as={NavLink} to="/bookshelves">
+                  <FontAwesomeIcon icon="bookmark" className="me-1" />
+                  Bookshelves
+                </Nav.Link>
               </>
             )}
           </Nav>

@@ -6,6 +6,10 @@ from django.contrib.auth.models import User
 class BookSerializer(serializers.ModelSerializer):
     google_data = serializers.SerializerMethodField()
     sort_key = serializers.SerializerMethodField()
+    # Add fields for related model names
+    category_name = serializers.SerializerMethodField()
+    bookshelf_name = serializers.SerializerMethodField()
+    series_title = serializers.SerializerMethodField()
 
     class Meta:
         model = Book
@@ -21,6 +25,15 @@ class BookSerializer(serializers.ModelSerializer):
 
     def get_sort_key(self, obj):
         return obj.sort_key
+
+    def get_category_name(self, obj):
+        return obj.category.name if obj.category else None
+
+    def get_bookshelf_name(self, obj):
+        return obj.bookshelf.name if obj.bookshelf else None
+
+    def get_series_title(self, obj):
+        return obj.series.title if obj.series else None
 
 
 class BookshelfSerializer(serializers.ModelSerializer):

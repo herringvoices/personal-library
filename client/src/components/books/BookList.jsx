@@ -2,7 +2,7 @@ import { Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-export default function BookList({ books }) {
+export default function BookList({ books, onBookClick }) {
   if (!books || books.length === 0) {
     return <p>No books found.</p>;
   }
@@ -25,7 +25,11 @@ export default function BookList({ books }) {
           <div className="row">
             {categoryBooks.map((book) => (
               <div key={book.id} className="col-md-6 col-lg-4 mb-3">
-                <div className="card h-100">
+                <div
+                  className="card h-100"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => onBookClick && onBookClick(book)}
+                >
                   <div className="row g-0">
                     <div className="col-4">
                       {book.google_data?.imageLinks?.thumbnail ? (
