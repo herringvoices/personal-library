@@ -4,10 +4,14 @@ Provides functionality to fetch book data from Google Books API.
 """
 
 import requests
-from django.conf import settings
+import os
+
+# Default API configuration
+DEFAULT_API_URL = "https://www.googleapis.com/books/v1/volumes"
+DEFAULT_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY", "")
 
 
-def fetch_book_data(isbn):
+def fetch_book_data(isbn, api_url=None, api_key=None):
     """
     Fetch book data from Google Books API using a two-step process.
 
@@ -16,19 +20,27 @@ def fetch_book_data(isbn):
 
     Args:
         isbn (str): The ISBN of the book to search for
+        api_url (str, optional): Google Books API URL. Defaults to environment variable or hardcoded value.
+        api_key (str, optional): Google Books API key. Defaults to environment variable or empty string.
 
     Returns:
         dict: Detailed book information from Google Books API or empty dict if not found
     """
+    # Use provided values or defaults
+    api_url = api_url or DEFAULT_API_URL
+    api_key = api_key or DEFAULT_API_KEY
+
     # Step 1: Search by ISBN to get the volume ID
     search_params = {
         "q": f"isbn:{isbn}",
-        "key": settings.GOOGLE_BOOKS_API_KEY,
     }
+
+    # Only add API key if it's available
+    if api_key:
+        search_params["key"] = api_key
+
     try:
-        search_response = requests.get(
-            settings.GOOGLE_BOOKS_API_URL, params=search_params
-        )
+        search_response = requests.get(api_url, params=search_params)
         search_response.raise_for_status()
         search_data = search_response.json()
 
@@ -44,8 +56,12 @@ def fetch_book_data(isbn):
     volume_id = search_data["items"][0]["id"]
 
     # Step 2: Get detailed information using the volume ID
-    detail_url = f"{settings.GOOGLE_BOOKS_API_URL}/{volume_id}"
-    detail_params = {"key": settings.GOOGLE_BOOKS_API_KEY}
+    detail_url = f"{api_url}/{volume_id}"
+    detail_params = {}
+
+    # Only add API key if it's available
+    if api_key:
+        detail_params["key"] = api_key
 
     try:
         detail_response = requests.get(detail_url, params=detail_params)

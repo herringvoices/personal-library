@@ -3,6 +3,7 @@ import { AuthorizedRoute } from "./auth/AuthorizedRoute";
 import Login from "./auth/Login";
 import Register from "./auth/Register";
 import NavBar from "./NavBar";
+import CatalogueView from "./books/CatalogueView";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -26,6 +27,15 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           element={
             <AuthorizedRoute loggedInUser={loggedInUser}>
               <h1 className="text-center">Welcome</h1>
+            </AuthorizedRoute>
+          }
+        />
+
+        <Route
+          path="catalogue"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser}>
+              <CatalogueView />
             </AuthorizedRoute>
           }
         />

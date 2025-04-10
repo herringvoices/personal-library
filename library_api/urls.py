@@ -8,14 +8,18 @@ from .views import (
     UserViewSet,
     current_user,
     register_user,
+    search_book_by_isbn,
 )
 
-# Create custom URL patterns first 
+# Create custom URL patterns first
 # When I had them after, they were not workinh (404 error)
 # I think it was trying to access /users/me/ as if it were /users/{id}/
 urlpatterns = [
     path("users/me/", current_user, name="current_user"),
     path("register/", register_user, name="register_user"),
+    path(
+        "books/search/", search_book_by_isbn, name="search_book_by_isbn"
+    ),  # Add new endpoint
 ]
 
 # Then add router-generated URLs

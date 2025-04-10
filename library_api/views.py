@@ -11,35 +11,88 @@ from django.contrib.auth.models import User
 from rest_framework.permissions import IsAdminUser, IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from .services.google_books import fetch_book_data
 
 
 class BookViewSet(viewsets.ModelViewSet):
-    queryset = Book.objects.all()
     serializer_class = BookSerializer
+    permission_classes = [IsAuthenticated]
 
-    # Uncomment and modify if you want to restrict to current user:
-    # def get_queryset(self):
-    #     return Book.objects.filter(user=self.request.user)
+    def get_queryset(self):
+        """Return only books that belong to the current authenticated user"""
+        return Book.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Automatically assign the current user when creating a new book"""
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """Ensure updates maintain the current user ownership"""
+        serializer.save(user=self.request.user)
 
 
 class BookshelfViewSet(viewsets.ModelViewSet):
-    queryset = Bookshelf.objects.all()
     serializer_class = BookshelfSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Return only bookshelves that belong to the current authenticated user"""
+        return Bookshelf.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Automatically assign the current user when creating a new bookshelf"""
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """Ensure updates maintain the current user ownership"""
+        serializer.save(user=self.request.user)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
-    queryset = Category.objects.all()
     serializer_class = CategorySerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Return categories owned by the current user or used in their books"""
+        # Include both categories created by this user AND those used in their books
+        return Category.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Automatically assign the current user when creating a new category"""
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """Ensure updates maintain the current user ownership"""
+        serializer.save(user=self.request.user)
 
 
 class SeriesViewSet(viewsets.ModelViewSet):
-    queryset = Series.objects.all()
     serializer_class = SeriesSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """Return series owned by the current user"""
+        # Include all series created by this user, not just those used in books
+        return Series.objects.filter(user=self.request.user)
+
+    def perform_create(self, serializer):
+        """Automatically assign the current user when creating a new series"""
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """Ensure updates maintain the current user ownership"""
+        serializer.save(user=self.request.user)
 
 
 class UserViewSet(viewsets.ReadOnlyModelViewSet):  # GET-only access
-    queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        """
+        Users can only see their own information
+        """
+        return User.objects.filter(id=self.request.user.id)
 
 
 @api_view(["GET"])
@@ -48,8 +101,6 @@ def current_user(request):
     """
     Retrieve the current authenticated user's details
     """
-    print("DEBUG: current_user view called!")  # Add this
-    print(f"DEBUG: Auth header: {request.META.get('HTTP_AUTHORIZATION')}")  # Add this
     serializer = UserSerializer(request.user)
     return Response(serializer.data)
 
@@ -70,3 +121,24 @@ def register_user(request):
         )
         return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([AllowAny])  # Making this public, modify if needed
+def search_book_by_isbn(request):
+    """
+    Search for a book by ISBN using Google Books API
+    """
+    isbn = request.query_params.get("isbn")
+    if not isbn:
+        return Response(
+            {"error": "ISBN parameter is required."}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    data = fetch_book_data(isbn)
+    if not data:
+        return Response(
+            {"error": "No data found for the provided ISBN."},
+            status=status.HTTP_404_NOT_FOUND,
+        )
+    return Response(data, status=status.HTTP_200_OK)

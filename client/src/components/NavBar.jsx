@@ -1,28 +1,47 @@
 import { NavLink } from "react-router-dom";
-import { Button, Navbar, Nav } from "react-bootstrap";
+import { Button, Navbar, Nav, Container } from "react-bootstrap";
 import { logout } from "../managers/authManager";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function NavBar({ loggedInUser, setLoggedInUser }) {
   return (
     <Navbar bg="light" expand="lg">
-      <Navbar.Brand as={NavLink} to="/" className="mx-5">
-        <FontAwesomeIcon icon="fa-solid fa-home" />
-      </Navbar.Brand>
-      <Nav className="ms-auto mx-5">
-        {loggedInUser ? (
-          <Button
-            variant="outline-danger"
-            onClick={() => logout().then(() => setLoggedInUser(null))}
-          >
-            Logout
-          </Button>
-        ) : (
-          <Nav.Link as={NavLink} to="/login">
-            <Button variant="outline-primary">Login</Button>
-          </Nav.Link>
-        )}
-      </Nav>
+      <Container>
+        <Navbar.Brand as={NavLink} to="/">
+          <FontAwesomeIcon icon="fa-solid fa-book" className="me-2" />
+          Personal Library
+        </Navbar.Brand>
+        <Navbar.Toggle aria-controls="basic-navbar-nav" />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="me-auto">
+            {loggedInUser && (
+              <>
+                <Nav.Link as={NavLink} to="/catalogue">
+                  Catalogue
+                </Nav.Link>
+                {/* More nav links will go here for other views */}
+              </>
+            )}
+          </Nav>
+          <Nav>
+            {loggedInUser ? (
+              <div className="d-flex align-items-center">
+                <span className="me-3">Hello, {loggedInUser.username}</span>
+                <Button
+                  variant="outline-danger"
+                  onClick={() => logout().then(() => setLoggedInUser(null))}
+                >
+                  Logout
+                </Button>
+              </div>
+            ) : (
+              <Nav.Link as={NavLink} to="/login">
+                <Button variant="outline-primary">Login</Button>
+              </Nav.Link>
+            )}
+          </Nav>
+        </Navbar.Collapse>
+      </Container>
     </Navbar>
   );
 }
