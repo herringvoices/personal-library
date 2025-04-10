@@ -88,7 +88,7 @@ DATABASES = {
         "USER": os.environ.get("DB_USERNAME", "postgres"),
         "PASSWORD": os.environ.get("DB_PASSWORD", ""),
         "HOST": "localhost",
-        "PORT": "5432",  # default PostgreSQL port
+        "PORT": "5432", 
     }
 }
 
@@ -152,3 +152,7 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "SIGNING_KEY": os.environ.get("JWT_SIGNING_KEY", SECRET_KEY),
 }
+
+# Google Books API settings
+GOOGLE_BOOKS_API_KEY = os.environ.get("GOOGLE_BOOKS_API_KEY", "")
+GOOGLE_BOOKS_API_URL = "https://www.googleapis.com/books/v1/volumes"
