@@ -6,9 +6,19 @@ from .views import (
     CategoryViewSet,
     SeriesViewSet,
     UserViewSet,
+    current_user,
+    register_user,
 )
 
-# Create the DRF router and register your viewsets
+# Create custom URL patterns first 
+# When I had them after, they were not workinh (404 error)
+# I think it was trying to access /users/me/ as if it were /users/{id}/
+urlpatterns = [
+    path("users/me/", current_user, name="current_user"),
+    path("register/", register_user, name="register_user"),
+]
+
+# Then add router-generated URLs
 router = DefaultRouter()
 router.register(r"books", BookViewSet, basename="book")
 router.register(r"bookshelves", BookshelfViewSet, basename="bookshelf")
@@ -16,5 +26,5 @@ router.register(r"categories", CategoryViewSet, basename="category")
 router.register(r"series", SeriesViewSet, basename="series")
 router.register(r"users", UserViewSet, basename="user")
 
-# The router generates the URL patterns
-urlpatterns = router.urls
+# Extend urlpatterns with router URLs
+urlpatterns += router.urls

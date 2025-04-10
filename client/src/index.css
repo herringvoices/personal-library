@@ -1,0 +1,40 @@
+/* Import the google web fonts you want to use */
+@import url("https://fonts.googleapis.com/css2?family=Nunito:wght@300&family=Quicksand&family=Roboto:wght@100&display=swap");
+
+/* FONTS
+font-family: "Nunito", sans-serif;
+font-family: "Quicksand", sans-serif;
+font-family: "Roboto", sans-serif; 
+*/
+
+/* COLOR PALETTE Feel Free to change*/
+:root {
+  --darkest: #000000;
+  --less-dark: #444444;
+  --accent: #ffa600;
+  --lightest: #ffffff;
+  --less-light: #cccccc;
+}
+
+/* GLOBAL STYLES */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: "Nunito", sans-serif;
+}
+
+body {
+  background-color: var(--appBackground);
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Roboto", serif;
+}
