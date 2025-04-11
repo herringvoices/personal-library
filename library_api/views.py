@@ -19,8 +19,15 @@ class BookViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        """Return only books that belong to the current authenticated user"""
-        return Book.objects.filter(user=self.request.user)
+        """Return books that belong to the current authenticated user, with optional filtering"""
+        queryset = Book.objects.filter(user=self.request.user)
+
+        # Filter by bookshelf/bookcase if provided in query params
+        bookshelf_id = self.request.query_params.get("bookshelf", None)
+        if bookshelf_id is not None:
+            queryset = queryset.filter(bookshelf_id=bookshelf_id)
+
+        return queryset
 
     def perform_create(self, serializer):
         """Automatically assign the current user when creating a new book"""

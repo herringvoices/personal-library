@@ -1,15 +1,6 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import {
-  Container,
-  Button,
-  Row,
-  Col,
-  Card,
-  Alert,
-  Breadcrumb,
-  Spinner,
-} from "react-bootstrap";
+import { Container, Button, Alert, Breadcrumb, Spinner } from "react-bootstrap";
 import { getBookcaseById } from "../../managers/bookcaseManager";
 import { getBooksByBookcase } from "../../managers/bookManager";
 import { getCategories } from "../../managers/categoryManager";
@@ -17,6 +8,7 @@ import { getAllSeries } from "../../managers/seriesManager";
 import BookFormOffcanvas from "../books/BookFormOffcanvas";
 import EditBookModal from "../books/EditBookModal";
 import BookDetailsModal from "../books/BookDetailsModal";
+import BookTable from "../books/BookTable";
 import { Link } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
@@ -91,12 +83,6 @@ export default function BookshelfView() {
     setEditingBook(null);
   };
 
-  // Handle book click to show details
-  const handleBookClick = (book) => {
-    setSelectedBook(book);
-    setShowBookDetails(true);
-  };
-
   if (loading) {
     return (
       <Container className="mt-4 text-center">
@@ -139,66 +125,16 @@ export default function BookshelfView() {
           This bookshelf is empty. Add some books to get started!
         </Alert>
       ) : (
-        Object.entries(booksByCategory).map(([category, categoryBooks]) => (
-          <div key={category} className="mb-4">
-            <h3>{category}</h3>
-            <Row>
-              {categoryBooks.map((book) => (
-                <Col key={book.id} md={6} lg={4} className="mb-3">
-                  <Card
-                    className="h-100"
-                    style={{ cursor: "pointer" }}
-                    onClick={() => handleBookClick(book)}
-                  >
-                    <div className="row g-0">
-                      <div className="col-4">
-                        {book.google_data?.imageLinks?.thumbnail ? (
-                          <img
-                            src={book.google_data.imageLinks.thumbnail}
-                            alt={book.google_data.title}
-                            className="card-img-top h-100 object-fit-cover"
-                          />
-                        ) : (
-                          <div className="bg-light h-100 d-flex align-items-center justify-content-center">
-                            <FontAwesomeIcon icon="book" size="3x" />
-                          </div>
-                        )}
-                      </div>
-                      <div className="col-8">
-                        <div className="card-body position-relative">
-                          <Button
-                            variant="link"
-                            className="position-absolute top-0 end-0 text-secondary p-0"
-                            onClick={() => setEditingBook(book)}
-                          >
-                            <FontAwesomeIcon icon="edit" />
-                          </Button>
-                          <h5 className="card-title">
-                            {book.google_data?.title}
-                          </h5>
-                          {book.google_data?.authors && (
-                            <p className="card-text text-muted">
-                              {book.google_data.authors.join(", ")}
-                            </p>
-                          )}
-                          {book.series_title && (
-                            <p className="card-text">
-                              <small className="text-muted">
-                                Series: {book.series_title}
-                                {book.volume_number &&
-                                  ` #${book.volume_number}`}
-                              </small>
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </div>
-        ))
+        <BookTable
+          books={books}
+          showBookshelf={false} // No need to show bookshelf since we're in a specific bookshelf view
+          onBookDetailsClick={(book) => {
+            setSelectedBook(book);
+            setShowBookDetails(true);
+          }}
+          onBookEditClick={setEditingBook}
+          loading={loading}
+        />
       )}
 
       {/* Add Book Offcanvas */}

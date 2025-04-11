@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Container, Button, ButtonGroup } from "react-bootstrap";
+import { Container, Button, ButtonGroup, Spinner } from "react-bootstrap";
 import { getBooks } from "../../managers/bookManager";
 import { getBookcases, createBookcase } from "../../managers/bookcaseManager";
 import { getCategories, createCategory } from "../../managers/categoryManager";
@@ -183,9 +183,20 @@ export default function CatalogueView() {
       />
 
       {loading ? (
-        <p>Loading books...</p>
+        <div className="text-center my-4">
+          <Spinner animation="border" role="status">
+            <span className="visually-hidden">Loading...</span>
+          </Spinner>
+        </div>
       ) : (
-        <BookList books={filteredBooks} onBookClick={handleBookClick} />
+        <BookList
+          books={filteredBooks}
+          onBookClick={handleBookClick}
+          onEditClick={(book) => {
+            setEditingBook(book);
+          }}
+          loading={loading}
+        />
       )}
 
       <BookFormOffcanvas
