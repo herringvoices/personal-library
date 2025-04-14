@@ -4,27 +4,28 @@ from django.contrib.auth.models import User
 
 
 class BookSerializer(serializers.ModelSerializer):
-    google_data = serializers.SerializerMethodField()
-    sort_key = serializers.SerializerMethodField()
-    # Add fields for related model names
-    category_name = serializers.SerializerMethodField()
-    bookshelf_name = serializers.SerializerMethodField()
-    series_title = serializers.SerializerMethodField()
+    category_name = serializers.SerializerMethodField(read_only=True)
+    bookshelf_name = serializers.SerializerMethodField(read_only=True)
+    series_title = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Book
-        fields = "__all__"  # This automatically includes all model fields
-        # The read_only_fields setting tells DRF not to expect or require
-        # the user field in the input data during validation.
-        # This allows the perform_create method in the ViewSet to set the user
-        # after validation passes.
+        fields = [
+            "id",
+            "isbn",
+            "title",
+            "subtitle",
+            "author",
+            "bookshelf",
+            "bookshelf_name",
+            "category",
+            "category_name",
+            "series",
+            "series_title",
+            "volume_number",
+            "user",
+        ]
         read_only_fields = ["user"]
-
-    def get_google_data(self, obj):
-        return obj.get_google_data()
-
-    def get_sort_key(self, obj):
-        return obj.sort_key
 
     def get_category_name(self, obj):
         return obj.category.name if obj.category else None
@@ -34,6 +35,16 @@ class BookSerializer(serializers.ModelSerializer):
 
     def get_series_title(self, obj):
         return obj.series.title if obj.series else None
+
+
+class BookDetailSerializer(BookSerializer):
+    google_data = serializers.SerializerMethodField(read_only=True)
+
+    class Meta(BookSerializer.Meta):
+        fields = BookSerializer.Meta.fields + ["google_data"]
+
+    def get_google_data(self, obj):
+        return obj.get_google_data()
 
 
 class BookshelfSerializer(serializers.ModelSerializer):

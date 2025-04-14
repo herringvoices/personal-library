@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from .models import Book, Bookshelf, Category, Series
 from .serializers import (
     BookSerializer,
+    BookDetailSerializer,
     BookshelfSerializer,
     CategorySerializer,
     SeriesSerializer,
@@ -15,8 +16,13 @@ from .services.google_books import fetch_book_data
 
 
 class BookViewSet(viewsets.ModelViewSet):
-    serializer_class = BookSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_serializer_class(self):
+        """Return different serializers for list and detail views"""
+        if self.action == "retrieve":
+            return BookDetailSerializer
+        return BookSerializer
 
     def get_queryset(self):
         """Return books that belong to the current authenticated user, with optional filtering"""
@@ -30,8 +36,27 @@ class BookViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        """Automatically assign the current user when creating a new book"""
-        serializer.save(user=self.request.user)
+        """
+        Automatically assign the current user when creating a new book
+        and populate book data from Google Books API
+        """
+        isbn = serializer.validated_data.get("isbn")
+
+        # Fetch book data from Google Books API
+        book_data = fetch_book_data(isbn)
+
+        # Extract title, subtitle and author
+        title = book_data.get("title", "Unknown Title")
+        subtitle = book_data.get("subtitle", "")
+
+        # Get primary author if available
+        authors = book_data.get("authors", ["Unknown Author"])
+        author = authors[0] if authors else "Unknown Author"
+
+        # Save with data from Google Books
+        serializer.save(
+            user=self.request.user, title=title, subtitle=subtitle, author=author
+        )
 
     def perform_update(self, serializer):
         """Ensure updates maintain the current user ownership"""

@@ -141,7 +141,8 @@ export default function CatalogueView() {
     }
   };
 
-  // Handle book click to show details
+
+
   const handleBookClick = (book) => {
     setSelectedBook(book);
     setShowBookDetails(true);

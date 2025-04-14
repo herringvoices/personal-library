@@ -13,14 +13,10 @@ export default function BookItemRow({
   return (
     <tr>
       <td>
-        {book.google_data?.title}
-        {book.google_data?.subtitle && ` (${book.google_data.subtitle})`}
+        {book.title}
+        {book.subtitle && ` (${book.subtitle})`}
       </td>
-      <td>
-        {book.google_data?.authors?.length > 0
-          ? book.google_data.authors[0]
-          : "Unknown"}
-      </td>
+      <td>{book.author || "Unknown"}</td>
       <td>
         {book.series_title && (
           <>

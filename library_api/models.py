@@ -37,6 +37,9 @@ class Bookshelf(models.Model):
 
 class Book(models.Model):
     isbn = models.CharField(max_length=13)
+    title = models.CharField(max_length=255, default="Unknown Title")
+    subtitle = models.CharField(max_length=255, blank=True, null=True)
+    author = models.CharField(max_length=255, default="Unknown Author")
     bookshelf = models.ForeignKey(
         Bookshelf, on_delete=models.CASCADE, related_name="books"
     )
@@ -46,30 +49,18 @@ class Book(models.Model):
     volume_number = models.PositiveIntegerField(null=True, blank=True)
 
     def __str__(self):
-        return (
-            f"{self.title} by {self.primary_author}"
-            if self.primary_author
-            else self.title
-        )
+        return f"{self.title} by {self.author}"
 
     @property
     def sort_key(self):
         return (
             self.category.name if self.category else "",
-            self.primary_author,
+            self.author,
             1 if self.series else 0,
             self.series.title if self.series else "",
             self.volume_number or 0,
             self.title,
         )
-
-    @property
-    def primary_author(self):
-        return self.get_google_data().get("authors", [""])[0]
-
-    @property
-    def title(self):
-        return self.get_google_data().get("title", "")
 
     def get_google_data(self):
         from .services.google_books import fetch_book_data

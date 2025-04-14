@@ -55,6 +55,9 @@ export default function EditBookModal({
       await updateBook({
         id: book.id,
         isbn: book.isbn,
+        title: book.title,
+        subtitle: book.subtitle,
+        author: book.author,
         bookshelf: parseInt(bookshelfId),
         category: categoryId ? parseInt(categoryId) : null,
         series: seriesId,
@@ -133,21 +136,15 @@ export default function EditBookModal({
               {book.google_data?.imageLinks?.thumbnail && (
                 <img
                   src={book.google_data.imageLinks.thumbnail}
-                  alt={book.google_data.title}
+                  alt={book.title}
                   style={{ width: "100px" }}
                   className="me-3"
                 />
               )}
               <div>
-                <h4>{book.google_data?.title}</h4>
-                {book.google_data?.subtitle && (
-                  <p>{book.google_data.subtitle}</p>
-                )}
-                {book.google_data?.authors && (
-                  <p className="text-muted">
-                    By {book.google_data.authors.join(", ")}
-                  </p>
-                )}
+                <h4>{book.title}</h4>
+                {book.subtitle && <p>{book.subtitle}</p>}
+                <p className="text-muted">By {book.author}</p>
               </div>
             </div>
 
