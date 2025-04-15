@@ -43,25 +43,28 @@ export default function BookItemRow({
         )}
       </td>
       <td className="align-middle">{book.category_name || "Uncategorized"}</td>
-      {showBookshelf && <td className="align-middle">{book.bookshelf_name || "None"}</td>}
+      {showBookshelf && (
+        <td className="align-middle">{book.bookshelf_name || "None"}</td>
+      )}
       <td className="text-end align-middle">
-        <Button
-          variant="outline-primary"
-          size="sm"
-          className="me-2"
-          onClick={() => onDetailsClick && onDetailsClick(book)}
-        >
-          <FontAwesomeIcon icon="eye" className="me-1" /> Details
-        </Button>
-        {onEditClick && (
+        <div className="d-flex justify-content-end gap-2">
           <Button
-            variant="outline-secondary"
+            variant="outline-primary"
             size="sm"
-            onClick={() => onEditClick && onEditClick(book)}
+            onClick={() => onDetailsClick && onDetailsClick(book)}
           >
-            <FontAwesomeIcon icon="edit" className="me-1" /> Edit
+            <FontAwesomeIcon icon="eye" className="me-1" /> Details
           </Button>
-        )}
+          {onEditClick && (
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={() => onEditClick && onEditClick(book)}
+            >
+              <FontAwesomeIcon icon="edit" className="me-1" /> Edit
+            </Button>
+          )}
+        </div>
       </td>
     </tr>
   );

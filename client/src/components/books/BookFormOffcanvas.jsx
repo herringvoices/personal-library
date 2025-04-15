@@ -148,7 +148,8 @@ export default function BookFormOffcanvas({
         await createBook(bookPayload);
       }
 
-      onSave();
+      // Call handleClose instead of onSave directly to ensure state is reset
+      handleClose();
     } catch (error) {
       console.error("Error saving book:", error);
       setFormError("Error saving book");
