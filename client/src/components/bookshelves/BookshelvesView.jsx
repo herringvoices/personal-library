@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Container, Row, Col, Card, Button } from "react-bootstrap";
 import { Link } from "react-router-dom";
-import { getBookcases } from "../../managers/bookcaseManager";
+import { getBookcases, createBookcase } from "../../managers/bookcaseManager";
 import CreateEntityModal from "../common/CreateEntityModal";
 import EditBookshelfModal from "./EditBookshelfModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -32,7 +32,10 @@ export default function BookshelvesView() {
   // Handle bookshelf creation
   const handleCreateBookshelf = async (name) => {
     try {
-      // After creating, refresh the list
+      // First create the new bookshelf
+      await createBookcase({ name });
+
+      // Then refresh the list
       const updatedBookshelves = await getBookcases();
       setBookshelves(updatedBookshelves || []);
       return true;

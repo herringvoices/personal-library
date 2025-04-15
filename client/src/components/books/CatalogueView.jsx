@@ -62,20 +62,38 @@ export default function CatalogueView() {
 
     // Filter by title
     if (searchCriteria.title) {
-      results = results.filter((book) =>
-        book.google_data?.title
-          ?.toLowerCase()
-          .includes(searchCriteria.title.toLowerCase())
-      );
+      const searchTerm = searchCriteria.title.toLowerCase();
+      results = results.filter((book) => {
+        // Check title in the book object first (our stored field)
+        const bookTitle = book.title?.toLowerCase() || "";
+        const bookSubtitle = book.subtitle?.toLowerCase() || "";
+
+        // Also check google_data as fallback for backwards compatibility
+        const googleTitle = book.google_data?.title?.toLowerCase() || "";
+
+        return (
+          bookTitle.includes(searchTerm) ||
+          bookSubtitle.includes(searchTerm) ||
+          googleTitle.includes(searchTerm)
+        );
+      });
     }
 
     // Filter by author
     if (searchCriteria.author) {
-      results = results.filter((book) =>
-        book.google_data?.authors?.some((author) =>
-          author.toLowerCase().includes(searchCriteria.author.toLowerCase())
-        )
-      );
+      const searchTerm = searchCriteria.author.toLowerCase();
+      results = results.filter((book) => {
+        // Check author in the book object first (our stored field)
+        const bookAuthor = book.author?.toLowerCase() || "";
+
+        // Also check google_data authors as fallback
+        const googleAuthors = book.google_data?.authors || [];
+        const hasMatchingGoogleAuthor = googleAuthors.some((author) =>
+          author.toLowerCase().includes(searchTerm)
+        );
+
+        return bookAuthor.includes(searchTerm) || hasMatchingGoogleAuthor;
+      });
     }
 
     // Filter by series
