@@ -24,6 +24,10 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
                   <FontAwesomeIcon icon="bookmark" className="me-1" />
                   Bookshelves
                 </Nav.Link>
+                <Nav.Link as={NavLink} to="/settings">
+                  <FontAwesomeIcon icon="cog" className="me-1" />
+                  Settings
+                </Nav.Link>
               </>
             )}
           </Nav>

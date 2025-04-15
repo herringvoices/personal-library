@@ -35,6 +35,7 @@ export default function BookDetailsModal({ book, show, onHide, onEdit }) {
   useEffect(() => {
     if (!show) {
       setDetailedBook(null);
+      setError(null); // Also reset error state
     }
   }, [show]);
 

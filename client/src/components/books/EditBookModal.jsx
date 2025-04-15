@@ -11,6 +11,7 @@ import { updateBook, deleteBook } from "../../managers/bookManager";
 import { createCategory } from "../../managers/categoryManager";
 import SeriesSelector from "./SeriesSelector";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { createSeries } from "../../managers/seriesManager";
 
 export default function EditBookModal({
   book,
@@ -29,6 +30,7 @@ export default function EditBookModal({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [newCategoryName, setNewCategoryName] = useState("");
+  const [newSeriesTitle, setNewSeriesTitle] = useState(null);
 
   // Update form state when book changes
   useEffect(() => {
@@ -52,6 +54,33 @@ export default function EditBookModal({
     setError("");
 
     try {
+      let finalSeriesId = seriesId;
+
+      // If we have a new series title, create the series first
+      if (newSeriesTitle && newSeriesTitle.trim()) {
+        try {
+          const createdSeries = await createSeries({
+            title: newSeriesTitle.trim(),
+          });
+          if (createdSeries && createdSeries.id) {
+            finalSeriesId = createdSeries.id;
+
+            // Update parent component's series list
+            if (onSave && seriesList) {
+              onSave({
+                seriesOnly: true,
+                updatedSeriesList: [...seriesList, createdSeries],
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Error creating new series:", error);
+          setError("Failed to create new series. Please try again.");
+          setIsProcessing(false);
+          return;
+        }
+      }
+
       await updateBook({
         id: book.id,
         isbn: book.isbn,
@@ -60,13 +89,14 @@ export default function EditBookModal({
         author: book.author,
         bookshelf: parseInt(bookshelfId),
         category: categoryId ? parseInt(categoryId) : null,
-        series: seriesId,
+        series: finalSeriesId,
         volume_number: volumeNumber,
       });
 
       if (onSave) {
         onSave();
       }
+      // The modal will be closed by the parent's onSave handler
     } catch (error) {
       console.error("Error updating book:", error);
       setError("Failed to update book. Please try again.");
@@ -221,6 +251,7 @@ export default function EditBookModal({
                 onChange={setSeriesId}
                 volumeNumber={volumeNumber}
                 onVolumeChange={setVolumeNumber}
+                onNewSeriesTitleChange={setNewSeriesTitle}
               />
             </Form>
           </>

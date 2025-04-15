@@ -12,6 +12,12 @@ export default function CreateEntityModal({
   const [error, setError] = useState("");
   const [isCreating, setIsCreating] = useState(false);
 
+  const handleClose = () => {
+    setName("");
+    setError("");
+    onHide();
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -32,12 +38,6 @@ export default function CreateEntityModal({
     } finally {
       setIsCreating(false);
     }
-  };
-
-  const handleClose = () => {
-    setName("");
-    setError("");
-    onHide();
   };
 
   return (

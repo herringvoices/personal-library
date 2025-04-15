@@ -16,6 +16,7 @@ import {
 } from "../../managers/bookManager";
 import { createCategory } from "../../managers/categoryManager";
 import { createBookcase } from "../../managers/bookcaseManager";
+import { createSeries } from "../../managers/seriesManager";
 import SeriesSelector from "./SeriesSelector";
 import CreateEntityModal from "../common/CreateEntityModal";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -41,6 +42,7 @@ export default function BookFormOffcanvas({
   const [volumeNumber, setVolumeNumber] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
   const [formError, setFormError] = useState("");
+  const [newSeriesTitle, setNewSeriesTitle] = useState(null);
 
   // Add state for modals
   const [showAddCategory, setShowAddCategory] = useState(false);
@@ -102,11 +104,38 @@ export default function BookFormOffcanvas({
     setFormError("");
 
     try {
+      let finalSeriesId = seriesId;
+
+      // If we have a new series title, create the series first
+      if (newSeriesTitle && newSeriesTitle.trim()) {
+        try {
+          const createdSeries = await createSeries({
+            title: newSeriesTitle.trim(),
+          });
+          if (createdSeries && createdSeries.id) {
+            finalSeriesId = createdSeries.id;
+
+            // Update parent component's series list
+            if (onSave && seriesList) {
+              onSave({
+                seriesOnly: true,
+                updatedSeriesList: [...seriesList, createdSeries],
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Error creating new series:", error);
+          setFormError("Failed to create new series. Please try again.");
+          setIsSaving(false);
+          return;
+        }
+      }
+
       const bookPayload = {
         isbn: isbn,
         bookshelf: parseInt(bookshelfId),
         category: categoryId ? parseInt(categoryId) : null,
-        series: seriesId,
+        series: finalSeriesId,
         volume_number: volumeNumber,
       };
 
@@ -123,6 +152,7 @@ export default function BookFormOffcanvas({
     } catch (error) {
       console.error("Error saving book:", error);
       setFormError("Error saving book");
+      // Don't close on error - this is correct behavior to let the user retry
     } finally {
       setIsSaving(false);
     }
@@ -137,6 +167,7 @@ export default function BookFormOffcanvas({
     setCategoryId("");
     setSeriesId(null);
     setVolumeNumber(null);
+    setNewSeriesTitle(null); // Reset new series title
     setFormError("");
     onHide();
   };
@@ -148,10 +179,11 @@ export default function BookFormOffcanvas({
       const updatedCategories = [...localCategories, newCategory];
       setLocalCategories(updatedCategories);
       setCategoryId(newCategory.id.toString());
-      // Inform parent component about the new category
-      if (onSave) {
-        onSave();
-      }
+      // Removed this call to onSave() which was causing the offcanvas to close
+      // Might want to add it back in later?
+      // if (onSave) {
+      //   onSave();
+      // }
     }
   };
 
@@ -162,10 +194,10 @@ export default function BookFormOffcanvas({
       const updatedBookcases = [...localBookcases, newBookcase];
       setLocalBookcases(updatedBookcases);
       setBookshelfId(newBookcase.id.toString());
-      // Inform parent component about the new bookcase
-      if (onSave) {
-        onSave();
-      }
+      // Remove this call to onSave() which was causing the offcanvas to close
+      // if (onSave) {
+      //   onSave();
+      // }
     }
   };
 
@@ -301,6 +333,7 @@ export default function BookFormOffcanvas({
               onChange={setSeriesId}
               volumeNumber={volumeNumber}
               onVolumeChange={setVolumeNumber}
+              onNewSeriesTitleChange={setNewSeriesTitle}
             />
 
             {formError && (

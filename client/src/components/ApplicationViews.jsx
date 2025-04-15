@@ -6,6 +6,7 @@ import NavBar from "./NavBar";
 import CatalogueView from "./books/CatalogueView";
 import BookshelvesView from "./bookshelves/BookshelvesView";
 import BookshelfView from "./bookshelves/BookshelfView";
+import SettingsView from "./settings/SettingsView";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -59,6 +60,15 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           element={
             <AuthorizedRoute loggedInUser={loggedInUser}>
               <BookshelfView />
+            </AuthorizedRoute>
+          }
+        />
+
+        <Route
+          path="settings"
+          element={
+            <AuthorizedRoute loggedInUser={loggedInUser}>
+              <SettingsView />
             </AuthorizedRoute>
           }
         />

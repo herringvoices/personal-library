@@ -103,8 +103,14 @@ export default function CatalogueView() {
   };
 
   // Handle book added or updated
-  const handleBookSaved = async () => {
-    // Refresh all data when something changes
+  const handleBookSaved = async (options = {}) => {
+    // Check if this is just a series list update
+    if (options && options.seriesOnly) {
+      setSeries(options.updatedSeriesList);
+      return;
+    }
+
+    // Normal save operation - refresh all data
     try {
       const [booksData, bookcasesData, categoriesData, seriesData] =
         await Promise.all([
@@ -122,7 +128,9 @@ export default function CatalogueView() {
     } catch (error) {
       console.error("Error refreshing data:", error);
     }
+
     setShowAddBook(false);
+    setEditingBook(null);
   };
 
   // Handle new category creation
@@ -140,8 +148,6 @@ export default function CatalogueView() {
       setBookcases([...bookcases, newBookcase]);
     }
   };
-
-
 
   const handleBookClick = (book) => {
     setSelectedBook(book);

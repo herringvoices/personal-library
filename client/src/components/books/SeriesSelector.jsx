@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Form, Button, InputGroup } from "react-bootstrap";
-import { createSeries } from "../../managers/seriesManager";
+import { Form } from "react-bootstrap";
 
 export default function SeriesSelector({
   seriesList,
@@ -8,36 +7,36 @@ export default function SeriesSelector({
   onChange,
   volumeNumber,
   onVolumeChange,
+  onNewSeriesTitleChange, // Used to pass the title up to parent
 }) {
   const [showNewSeries, setShowNewSeries] = useState(false);
   const [newSeriesTitle, setNewSeriesTitle] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
 
   const handleSeriesChange = (e) => {
     const value = e.target.value;
     if (value === "new") {
       setShowNewSeries(true);
+      onChange(null); // Clear any selected series
+      // Pass empty string initially when switching to new series mode
+      if (onNewSeriesTitleChange) {
+        onNewSeriesTitleChange("");
+      }
     } else {
       setShowNewSeries(false);
       onChange(value !== "" ? parseInt(value) : null);
+      // Clear new series title when selecting existing series
+      if (onNewSeriesTitleChange) {
+        onNewSeriesTitleChange(null);
+      }
     }
   };
 
-  const handleCreateSeries = async () => {
-    if (!newSeriesTitle.trim()) return;
-
-    setIsCreating(true);
-    try {
-      const newSeries = await createSeries({ title: newSeriesTitle });
-      if (newSeries && newSeries.id) {
-        onChange(newSeries.id);
-        setShowNewSeries(false);
-        setNewSeriesTitle("");
-      }
-    } catch (error) {
-      console.error("Error creating series:", error);
-    } finally {
-      setIsCreating(false);
+  const handleNewSeriesTitleChange = (e) => {
+    const title = e.target.value;
+    setNewSeriesTitle(title);
+    // Pass new title up to parent
+    if (onNewSeriesTitleChange) {
+      onNewSeriesTitleChange(title);
     }
   };
 
@@ -77,21 +76,12 @@ export default function SeriesSelector({
       {showNewSeries && (
         <Form.Group className="mb-3">
           <Form.Label>New Series Title</Form.Label>
-          <InputGroup>
-            <Form.Control
-              type="text"
-              value={newSeriesTitle}
-              onChange={(e) => setNewSeriesTitle(e.target.value)}
-              placeholder="Enter series title"
-            />
-            <Button
-              variant="outline-success"
-              onClick={handleCreateSeries}
-              disabled={!newSeriesTitle.trim() || isCreating}
-            >
-              {isCreating ? "Creating..." : "Create"}
-            </Button>
-          </InputGroup>
+          <Form.Control
+            type="text"
+            value={newSeriesTitle}
+            onChange={handleNewSeriesTitleChange}
+            placeholder="Enter series title"
+          />
         </Form.Group>
       )}
     </>
