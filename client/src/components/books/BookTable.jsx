@@ -45,9 +45,11 @@ export default function BookTable({
     <Table striped bordered hover responsive>
       <thead>
         <tr>
+          <th style={{ width: "60px" }}></th> {/* Thumbnail column */}
           <th>Title</th>
           <th>Author</th>
           <th>Series</th>
+          <th>Category</th> 
           {showBookshelf && <th>Bookshelf</th>}
           <th className="text-end">Actions</th>
         </tr>

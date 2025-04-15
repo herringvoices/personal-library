@@ -11,13 +11,30 @@ export default function BookItemRow({
   if (!book) return null;
 
   return (
-    <tr>
-      <td>
+    <tr style={{ fontSize: "1.1rem" }}>
+      <td className="text-center align-middle">
+        {book.small_thumbnail ? (
+          <img
+            src={book.small_thumbnail}
+            alt={book.title}
+            style={{ width: "70px", height: "auto", maxHeight: "100px" }}
+            className="my-1"
+          />
+        ) : (
+          <div
+            className="bg-light d-flex align-items-center justify-content-center"
+            style={{ width: "70px", height: "100px", margin: "0 auto" }}
+          >
+            <FontAwesomeIcon icon="book" />
+          </div>
+        )}
+      </td>
+      <td className="align-middle">
         {book.title}
         {book.subtitle && ` (${book.subtitle})`}
       </td>
-      <td>{book.author || "Unknown"}</td>
-      <td>
+      <td className="align-middle">{book.author || "Unknown"}</td>
+      <td className="align-middle">
         {book.series_title && (
           <>
             {book.series_title}
@@ -25,8 +42,9 @@ export default function BookItemRow({
           </>
         )}
       </td>
-      {showBookshelf && <td>{book.bookshelf_name || "None"}</td>}
-      <td className="text-end">
+      <td className="align-middle">{book.category_name || "Uncategorized"}</td>
+      {showBookshelf && <td className="align-middle">{book.bookshelf_name || "None"}</td>}
+      <td className="text-end align-middle">
         <Button
           variant="outline-primary"
           size="sm"

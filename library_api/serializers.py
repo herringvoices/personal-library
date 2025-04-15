@@ -7,6 +7,7 @@ class BookSerializer(serializers.ModelSerializer):
     category_name = serializers.SerializerMethodField(read_only=True)
     bookshelf_name = serializers.SerializerMethodField(read_only=True)
     series_title = serializers.SerializerMethodField(read_only=True)
+    sort_key = serializers.SerializerMethodField(read_only=True)  # Add this line
 
     class Meta:
         model = Book
@@ -16,6 +17,9 @@ class BookSerializer(serializers.ModelSerializer):
             "title",
             "subtitle",
             "author",
+            "small_thumbnail",
+            "large_thumbnail",
+            "details",
             "bookshelf",
             "bookshelf_name",
             "category",
@@ -24,6 +28,7 @@ class BookSerializer(serializers.ModelSerializer):
             "series_title",
             "volume_number",
             "user",
+            "sort_key",
         ]
         read_only_fields = ["user"]
 
@@ -35,6 +40,10 @@ class BookSerializer(serializers.ModelSerializer):
 
     def get_series_title(self, obj):
         return obj.series.title if obj.series else None
+
+    # Add this method
+    def get_sort_key(self, obj):
+        return obj.sort_key
 
 
 class BookDetailSerializer(BookSerializer):

@@ -51,11 +51,35 @@ class BookViewSet(viewsets.ModelViewSet):
 
         # Get primary author if available
         authors = book_data.get("authors", ["Unknown Author"])
-        author = authors[0] if authors else "Unknown Author"
+        original_author = authors[0] if authors else "Unknown Author"
+
+        # Convert author name to "LastName, FirstName" format for better sorting
+        # This handles simple cases like "Stephen King" -> "King, Stephen"
+        name_parts = original_author.split()
+        if len(name_parts) > 1:
+            last_name = name_parts[-1]
+            first_names = " ".join(name_parts[:-1])
+            author = f"{last_name}, {first_names}"
+        else:
+            author = original_author  # Single name or already formatted
+
+        # Get thumbnail images
+        image_links = book_data.get("imageLinks", {})
+        small_thumbnail = image_links.get("smallThumbnail", None)
+        large_thumbnail = image_links.get("thumbnail", None)
+
+        # Get description
+        details = book_data.get("description", None)
 
         # Save with data from Google Books
         serializer.save(
-            user=self.request.user, title=title, subtitle=subtitle, author=author
+            user=self.request.user,
+            title=title,
+            subtitle=subtitle,
+            author=author,
+            small_thumbnail=small_thumbnail,
+            large_thumbnail=large_thumbnail,
+            details=details,
         )
 
     def perform_update(self, serializer):

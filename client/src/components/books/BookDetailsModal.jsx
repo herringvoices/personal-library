@@ -61,7 +61,13 @@ export default function BookDetailsModal({ book, show, onHide, onEdit }) {
         ) : (
           <div className="d-flex mb-4">
             <div className="me-4" style={{ minWidth: "150px" }}>
-              {displayBook.google_data?.imageLinks?.thumbnail ? (
+              {displayBook.large_thumbnail ? (
+                <img
+                  src={displayBook.large_thumbnail}
+                  alt={displayBook.title}
+                  className="img-fluid"
+                />
+              ) : displayBook.google_data?.imageLinks?.thumbnail ? (
                 <img
                   src={displayBook.google_data.imageLinks.thumbnail}
                   alt={displayBook.title}
@@ -106,16 +112,18 @@ export default function BookDetailsModal({ book, show, onHide, onEdit }) {
         )}
 
         {/* Only show description if google data is available and not loading */}
-        {!loading && displayBook.google_data?.description && (
-          <div>
-            <h5>Description</h5>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: displayBook.google_data.description,
-              }}
-            />
-          </div>
-        )}
+        {!loading &&
+          (displayBook.details || displayBook.google_data?.description) && (
+            <div>
+              <h5>Description</h5>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html:
+                    displayBook.details || displayBook.google_data.description,
+                }}
+              />
+            </div>
+          )}
       </Modal.Body>
       <Modal.Footer>
         <Button variant="secondary" onClick={onHide}>

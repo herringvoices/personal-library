@@ -40,6 +40,9 @@ class Book(models.Model):
     title = models.CharField(max_length=255, default="Unknown Title")
     subtitle = models.CharField(max_length=255, blank=True, null=True)
     author = models.CharField(max_length=255, default="Unknown Author")
+    small_thumbnail = models.URLField(max_length=1000, blank=True, null=True)
+    large_thumbnail = models.URLField(max_length=1000, blank=True, null=True)
+    details = models.TextField(blank=True, null=True)
     bookshelf = models.ForeignKey(
         Bookshelf, on_delete=models.CASCADE, related_name="books"
     )
